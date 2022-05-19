@@ -29,18 +29,21 @@ public class Main {
     }
 
     public static void zipFiles(String path, File file) {
-        for (File item : Objects.requireNonNull(file.listFiles())) {
-            try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(path, true));
-                 FileInputStream fis = new FileInputStream(item)) {
-                ZipEntry entry = new ZipEntry(item.getName());
-                zout.putNextEntry(entry);
-                byte[] buffer = new byte[fis.available()];
-                fis.read(buffer);
-                zout.write(buffer);
-                zout.closeEntry();
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+        try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(path, true));
+             FileInputStream fis = new FileInputStream(path)) {
+            for (File item : Objects.requireNonNull(file.listFiles())) {
+                if (item.getAbsolutePath().endsWith(".dat")) {
+                    ZipEntry entry = new ZipEntry(item.getName());
+                    zout.putNextEntry(entry);
+                    byte[] buffer = new byte[fis.available()];
+                    fis.read(buffer);
+                    zout.write(buffer);
+                    zout.closeEntry();
+                    item.delete();
+                }
             }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
     }
 }
